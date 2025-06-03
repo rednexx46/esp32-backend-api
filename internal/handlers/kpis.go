@@ -3,24 +3,16 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rednexx46/esp32-backend-api/internal/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var kpisCollection *mongo.Collection
-
-func init() {
-	kpisCollection = db.GetMongoClient().
-		Database(os.Getenv("MONGO_DATABASE")).
-		Collection(os.Getenv("MONGO_KPIS_COLLECTION"))
-}
 
 // GetKPIsByDevice godoc
 // @Summary      Get KPIs by device
