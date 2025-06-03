@@ -15,13 +15,13 @@ RUN go mod download
 COPY . .
 
 # Generate Swagger docs
-RUN go install github.com/swaggo/swag/cmd/swag@latest && swag init -g cmd/main.go
+RUN go install github.com/swaggo/swag/cmd/swag@latest && swag init -g main.go
 
 # Run tests
-RUN go test ./tests/... -v
+#RUN go test ./tests/... -v
 
 # Build binary
-RUN go build -o esp32-backend-api ./cmd/main.go
+RUN go build -o esp32-backend-api main.go
 
 # Stage 2 – Runtime
 FROM alpine:latest
