@@ -1,0 +1,292 @@
+basePath: /api
+definitions:
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+host: gateway.local:8080
+info:
+  contact:
+    email: josexavier46@outlook.pt
+    name: José Xavier
+    url: https://github.com/rednexx46
+  description: REST API for handling sensor data, KPIs, and user authentication in
+    an IoT ESP32 system.
+  termsOfService: https://github.com/rednexx46/esp32-backend-api
+  title: ESP32 Backend API
+  version: "1.0"
+paths:
+  /api/kpis:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all KPIs with pagination
+      parameters:
+      - description: 'Max results (default: 100)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all KPIs
+      tags:
+      - kpis
+  /api/kpis/device/{device_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves KPIs for a specific device_id, paginated
+      parameters:
+      - description: Device ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      - description: 'Max results (default: 100)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get KPIs by device
+      tags:
+      - kpis
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT token
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid username or password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to generate token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Logs out the currently authenticated user by revoking their token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logged out successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout user
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      description: Retrieves the profile information of the currently authenticated
+        user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get authenticated user's profile
+      tags:
+      - auth
+  /devices/active:
+    get:
+      description: Retrieves a list of unique active device IDs from the sensors collection.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active device IDs
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get active devices
+      tags:
+      - devices
+  /sensors:
+    get:
+      description: Fetches all sensor data from the database, decrypting payloads
+        if necessary.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retrieve all sensor data
+      tags:
+      - sensors
+  /sensors/{device_id}:
+    get:
+      description: Retrieves all sensor data associated with a specific device ID.
+        Decrypts the payload if needed before returning.
+      parameters:
+      - description: Device ID
+        in: path
+        name: device_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get sensor data by device ID
+      tags:
+      - sensors
+  /ws/live-data:
+    get:
+      description: Opens a WebSocket connection to receive real-time sensor data pushed
+        from the backend. Requires a valid JWT token in the Authorization header.
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: WebSocket real-time data stream
+      tags:
+      - websocket
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
