@@ -9,18 +9,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rednexx46/esp32-backend-api/internal/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var sensorsCollection *mongo.Collection
-
-func init() {
-	sensorsCollection = db.GetMongoClient().
-		Database(os.Getenv("MONGO_DATABASE")).
-		Collection(os.Getenv("MONGO_SENSORS_COLLECTION"))
-}
 
 func decryptPayloadIfNeeded(payload string) string {
 	if os.Getenv("ENCRYPTION") != "true" {
