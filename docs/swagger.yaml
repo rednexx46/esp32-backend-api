@@ -15,7 +15,7 @@ definitions:
       token:
         type: string
     type: object
-host: gateway.local:8080
+host: localhost:8080
 info:
   contact:
     email: josexavier46@outlook.pt

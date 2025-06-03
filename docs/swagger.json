@@ -11,7 +11,7 @@
         },
         "version": "1.0"
     },
-    "host": "gateway.local:8080",
+    "host": "localhost:8080",
     "basePath": "/api",
     "paths": {
         "/api/kpis": {
