@@ -27,7 +27,7 @@ import (
 // @contact.url    https://github.com/rednexx46
 // @contact.email  josexavier46@outlook.pt
 
-// @host      localhost:8080
+// @host      gateway.local:8080
 // @BasePath  /api
 
 // @securityDefinitions.apikey BearerAuth
